@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Native shell: generated project plus the synced copy of the web build.
+    "ios/**",
   ]),
 ]);
 

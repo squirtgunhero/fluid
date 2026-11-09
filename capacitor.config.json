@@ -1,0 +1,16 @@
+{
+  "appId": "com.fluid.breathe",
+  "appName": "Fluid",
+  "webDir": "out",
+  "backgroundColor": "#06070b",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#06070b",
+    "preferredContentMode": "mobile",
+    "allowsLinkPreview": false,
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "server": {
+    "iosScheme": "capacitor"
+  }
+}

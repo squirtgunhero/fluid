@@ -1,0 +1,51 @@
+name: iOS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build the iOS app
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint and type-check
+        run: |
+          npm run lint
+          npx tsc --noEmit
+
+      - name: Build the web app
+        run: npm run build
+
+      - name: Sync the web build into the iOS project
+        run: npx cap sync ios
+
+      - name: Build for the iOS Simulator
+        run: |
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Upload the simulator build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fluid-simulator
+          path: build/Build/Products/Debug-iphonesimulator/App.app
