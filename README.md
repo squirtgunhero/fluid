@@ -32,12 +32,28 @@ Then open http://localhost:3000.
   refraction wobble. Zero is perfectly still.
 - **Atmosphere** sets the haze: blur depth, glass tint and how far the light
   diffuses.
+- **Sound**: paste a Suno share link and the song joins your library with its
+  title and art. In the iOS app the audio is downloaded so it plays offline
+  and drives the orb's glow; in a plain browser it streams. Import also takes
+  audio files (an MP3 downloaded from Suno, or anything else). Music begins
+  when a session starts and fades out when it ends, and the lock screen shows
+  the track with play, pause and skip.
 - **Full / Lite** toggles the heavier effects (SVG refraction, tilt, deep
   blur). Lite is chosen automatically on constrained devices.
 
 `prefers-reduced-motion` freezes the drift, morph, sway and ripples and keeps
 the breathing swell very small; the ring, the light and the words still carry
 the cue.
+
+## Suno
+
+Suno has no public developer API yet, so Fluid works from share links. A link
+like `https://suno.com/song/<id>` carries the song's ID; the share page's Open
+Graph tags give the title, artist and cover, and the public audio lives on
+Suno's CDN under the same ID. Only songs set to Public or Link Only resolve.
+Reading the page and downloading the audio happen natively in the iOS app
+(no CORS); on the web the app falls back to streaming the audio URL. Songs
+you've downloaded from Suno can always be imported as files.
 
 ## iOS
 

@@ -3,6 +3,8 @@
 import { motion, useTransform } from "framer-motion";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { FluidProvider, useFluid } from "./FluidProvider";
+import { SoundProvider } from "./SoundProvider";
+import { SoundPanel } from "./SoundPanel";
 import { Backdrop } from "./LightPools";
 import { FilterDefs } from "./FilterDefs";
 import { Orb, OrbCaption } from "./Orb";
@@ -24,6 +26,7 @@ function SceneVars({ children }: { children: ReactNode }) {
   const atmos = useTransform(mv.atmos, (a) => a.toFixed(3));
   const breath = useTransform(mv.breath, (b) => b.toFixed(3));
   const sessionAmt = useTransform(mv.sessionAmt, (s) => s.toFixed(3));
+  const level = useTransform(mv.level, (l) => l.toFixed(3));
 
   return (
     <motion.div
@@ -36,6 +39,7 @@ function SceneVars({ children }: { children: ReactNode }) {
         ["--glass-tint" as string]: tintAlpha,
         ["--breath" as string]: breath,
         ["--session" as string]: sessionAmt,
+        ["--level" as string]: level,
       }}
     >
       {children}
@@ -104,6 +108,9 @@ function Surface() {
             high="Hazy"
           />
         </section>
+        <section className="surface-sound chrome" aria-label="Sound">
+          <SoundPanel />
+        </section>
       </GlassPanel>
     </main>
   );
@@ -112,11 +119,13 @@ function Surface() {
 export function FluidScene() {
   return (
     <FluidProvider>
-      <FilterDefs />
-      <Backdrop />
-      <SceneVars>
-        <Surface />
-      </SceneVars>
+      <SoundProvider>
+        <FilterDefs />
+        <Backdrop />
+        <SceneVars>
+          <Surface />
+        </SceneVars>
+      </SoundProvider>
     </FluidProvider>
   );
 }

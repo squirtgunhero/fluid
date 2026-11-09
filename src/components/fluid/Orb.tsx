@@ -14,6 +14,7 @@ import {
 import { useCallback, useEffect, useRef, type KeyboardEvent } from "react";
 import { PHASE_LABEL, clamp, formatTime, lerp } from "@/lib/presets";
 import { useFluid } from "./FluidProvider";
+import { useSound } from "./SoundProvider";
 import { LightPools } from "./LightPools";
 import { LENS_FILTER_ID } from "./FilterDefs";
 
@@ -35,6 +36,7 @@ const RIPPLES = [0, 1 / 3, 2 / 3];
  */
 export function Orb() {
   const { mv, reducedMotion, richEffects, session, pattern, toggleSession } = useFluid();
+  const { playForSession } = useSound();
   const ref = useRef<HTMLButtonElement>(null);
 
   // Layout centre and diameter, in viewport pixels, excluding the follow offset.
@@ -115,8 +117,10 @@ export function Orb() {
   // Breathing: the whole orb swells and settles. Small under reduced motion,
   // where the ring, the light and the words carry the cue.
   const breathAmp = reducedMotion ? 0.03 : 0.2;
-  const breathScale = useTransform([mv.breath, mv.sessionAmt], ([b, s]: number[]) =>
-    lerp(0.975 + b * 0.05, 1 - breathAmp / 2 + b * breathAmp, s),
+  const breathScale = useTransform(
+    [mv.breath, mv.sessionAmt, mv.level],
+    ([b, s, lv]: number[]) =>
+      lerp(0.975 + b * 0.05, 1 - breathAmp / 2 + b * breathAmp, s) * (1 + lv * (reducedMotion ? 0 : 0.018)),
   );
   // Sway: a slow pendulum while in session.
   const sway = useTransform([mv.calm, mv.sessionAmt], ([c, s]: number[]) => Math.sin(c * 0.5) * 8 * s);
@@ -193,7 +197,11 @@ export function Orb() {
               ? "End the breathing session"
               : `Begin a ${pattern.label} breathing session. Arrow keys nudge the orb.`
           }
-          onClick={toggleSession}
+          onClick={() => {
+            // Inside the tap, so iOS lets the audio start with the session.
+            if (!session) playForSession();
+            toggleSession();
+          }}
           onKeyDown={onKeyDown}
           whileHover={{ scale: 1.015 }}
           whileTap={{ scale: 0.96 }}

@@ -52,6 +52,9 @@ type MotionValues = {
   phaseProgress: MotionValue<number>;
   /** 0 outside a session, 1 inside, springing between. */
   sessionAmt: MotionValue<number>;
+  /** Loudness of the playing music, 0–1, smoothed. Written by the sound
+   *  engine; the orb and the light listen to it. */
+  level: MotionValue<number>;
   /** Pointer position in viewport pixels. */
   pointerX: MotionValue<number>;
   pointerY: MotionValue<number>;
@@ -125,6 +128,7 @@ export function FluidProvider({ children }: { children: ReactNode }) {
   const phaseProgress = useMotionValue(0);
   const sessionRaw = useMotionValue(0);
   const sessionAmt = useSpring(sessionRaw, SESSION_SPRING);
+  const level = useMotionValue(0);
   const pointerX = useMotionValue(-1000);
   const pointerY = useMotionValue(-1000);
   const vw = useMotionValue(1280);
@@ -309,12 +313,13 @@ export function FluidProvider({ children }: { children: ReactNode }) {
       breath,
       phaseProgress,
       sessionAmt,
+      level,
       pointerX,
       pointerY,
       vw,
       vh,
     }),
-    [light, motion, atmos, time, calm, spin, breath, phaseProgress, sessionAmt, pointerX, pointerY, vw, vh],
+    [light, motion, atmos, time, calm, spin, breath, phaseProgress, sessionAmt, level, pointerX, pointerY, vw, vh],
   );
 
   const value = useMemo<FluidContextValue>(

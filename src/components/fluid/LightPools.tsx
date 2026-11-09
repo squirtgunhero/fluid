@@ -34,7 +34,7 @@ const POOLS: PoolSpec[] = [
 
 export const POOL_COUNT = POOLS.length;
 
-function Pool({ spec, time, vw, vh, light, atmos, breath, sessionAmt }: {
+function Pool({ spec, time, vw, vh, light, atmos, breath, sessionAmt, level }: {
   spec: PoolSpec;
   time: MotionValue<number>;
   vw: MotionValue<number>;
@@ -43,6 +43,7 @@ function Pool({ spec, time, vw, vh, light, atmos, breath, sessionAmt }: {
   atmos: MotionValue<number>;
   breath: MotionValue<number>;
   sessionAmt: MotionValue<number>;
+  level: MotionValue<number>;
 }) {
   const x = useTransform([time, vw], ([t, w]: number[]) =>
     (spec.cx - 0.5 + spec.ax * Math.sin(t * spec.fx + spec.px)) * w,
@@ -53,8 +54,13 @@ function Pool({ spec, time, vw, vh, light, atmos, breath, sessionAmt }: {
   // Haze spreads the light: pools grow and soften as atmosphere rises.
   const scale = useTransform(atmos, (a) => 1 + a * 0.5);
   // In a session the light swells and dims with the breath.
-  const opacity = useTransform([light, breath, sessionAmt], ([l, b, s]: number[]) =>
-    Math.min(1, spec.alpha * (0.3 + 0.9 * Math.pow(l, spec.lightCurve)) * (1 + (b - 0.5) * 0.5 * s)),
+  const opacity = useTransform(
+    [light, breath, sessionAmt, level],
+    ([l, b, s, lv]: number[]) =>
+      Math.min(
+        1,
+        spec.alpha * (0.3 + 0.9 * Math.pow(l, spec.lightCurve)) * (1 + (b - 0.5) * 0.5 * s) * (1 + lv * 0.22),
+      ),
   );
 
   return (
@@ -93,6 +99,7 @@ export function LightPools() {
           atmos={mv.atmos}
           breath={mv.breath}
           sessionAmt={mv.sessionAmt}
+          level={mv.level}
         />
       ))}
     </>
